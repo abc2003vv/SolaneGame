@@ -20,13 +20,15 @@ public class Auth : MonoBehaviour
     {
         try
         {
-            using(SqlConnection con = new SqlConnection(connectionString))
+            using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
                 Debug.Log("connect success!");
                 string query = "insert into account(username,password) values(@username,@password)";
-                using (SqlCommand command = new SqlCommand("@username", username.text));
             }
+        }
+        catch (Exception ex) {
+            Debug.Log("lỗi" + ex);
         }
     }
     public void Loginbtn() 
