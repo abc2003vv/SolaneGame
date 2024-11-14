@@ -11,10 +11,25 @@ public class Auth : MonoBehaviour
 {
     public InputField username;
     public InputField password;
+    public InputField email;
+    public InputField usernameRes;
+    public InputField passwordRes;
     private string connectionString = "Server=DESKTOP-DPT7713\\SQLEXPRESS; Database=SolanaGame; User Id=sa; Password=123456;";
     // Start is called before the first frame update
-    
-    private void Loginbtn() 
+    public void Registerbtn()
+    {
+        try
+        {
+            using(SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                Debug.Log("connect success!");
+                string query = "insert into account(username,password) values(@username,@password)";
+                using (SqlCommand command = new SqlCommand("@username", username.text));
+            }
+        }
+    }
+    public void Loginbtn() 
     {
         try
         {
@@ -24,11 +39,11 @@ public class Auth : MonoBehaviour
                 Debug.Log("Kết nối thành công đến SQL Server!");
 
                 // Câu truy vấn SQL để lấy mật khẩu từ cơ sở dữ liệu
-                string query = "SELECT Password FROM Account WHERE Username = @username";
+                string query = "SELECT password FROM [Account] WHERE username = @username";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     // Thêm tham số vào câu truy vấn
-                    command.Parameters.AddWithValue("@username", username);
+                    command.Parameters.AddWithValue("@username", username.text);
 
                     // Thực hiện truy vấn và lấy kết quả
                     string storedPassword = command.ExecuteScalar() as string;
