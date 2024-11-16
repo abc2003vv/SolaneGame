@@ -14,7 +14,25 @@ public class Auth : MonoBehaviour
     public InputField email;
     public InputField usernameRes;
     public InputField passwordRes;
+    public GameObject PanelLogin;
+    public GameObject PanelRes;
+    public GameObject PanelMessage;
+    public Text text;
     private string connectionString = "Server=DESKTOP-DPT7713\\SQLEXPRESS; Database=SolanaGame; User Id=sa; Password=123456;";
+    public void btnOK()
+    {
+        PanelMessage.SetActive(false);
+    }
+    public void btnReclick()
+    {
+        PanelLogin.SetActive(false);
+        PanelRes.SetActive(true);
+    }
+    public void OK()
+    {
+        PanelRes.SetActive(false);
+        PanelLogin.SetActive(true);
+    }
     // Start is called before the first frame update
     public void Registerbtn()
     {
@@ -24,7 +42,6 @@ public class Auth : MonoBehaviour
             {
                 con.Open();
                 Debug.Log("connect success!");
-                string query = "insert into account(username,password) values(@username,@password)";
             }
         }
         catch (Exception ex) {
@@ -60,19 +77,22 @@ public class Auth : MonoBehaviour
                         }
                         else
                         {
-                            Debug.Log("Mật khẩu sai!");
+                            text.text = "Mât khẩu sai!";
+                            PanelMessage.SetActive(true);
                         }
                     }
                     else
                     {
-                        Debug.Log("Tài khoản không tồn tại!");
+                        text.text = "tài khoản không tồn tại";
+                        PanelMessage.SetActive(true);
                     }
                 }
             }
         }
         catch (Exception e)
         {
-            Debug.LogError("Lỗi khi kết nối hoặc truy vấn cơ sở dữ liệu: " + e.Message);
+           text.text = "Lỗi khi kết nối" + e.Message;
+            PanelMessage.SetActive(true);
         }
     }
 }
