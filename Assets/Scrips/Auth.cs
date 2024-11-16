@@ -1,14 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Data.SqlClient;
 using System;
-using UnityEditor.MemoryProfiler;
-using UnityEngine.Windows;
-using UnityEditor.Search;
-using System.Text.RegularExpressions;
-
 public class Auth : MonoBehaviour
 {
     public InputField username;
