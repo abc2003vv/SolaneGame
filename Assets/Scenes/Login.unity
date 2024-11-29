@@ -1024,16 +1024,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4d94e66d4fd7e04e8aba6023f685b6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  username: {fileID: 1156486448}
-  password: {fileID: 2036492881}
-  email: {fileID: 820863177}
-  usernameRes: {fileID: 680846273}
-  passwordRes: {fileID: 160320681}
-  confirmpassword: {fileID: 0}
-  PanelLogin: {fileID: 1106257235}
-  PanelRes: {fileID: 1401186686}
-  PanelMessage: {fileID: 800391976}
-  text: {fileID: 55349360}
 --- !u!1 &387454667
 GameObject:
   m_ObjectHideFlags: 0
@@ -1974,11 +1964,11 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 899432573}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: d42d1be113e34a94a97a569335e1dd08, type: 3}
+  m_VideoClip: {fileID: 32900000, guid: 00ba1d929b6dbe14d86282b523329e64, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 0}
-  m_TargetTexture: {fileID: 8400000, guid: b46278e4038bb5c4eabb83c4aafae660, type: 2}
+  m_TargetTexture: {fileID: 8400000, guid: 1223de0b1e399fa4880e854a5c45788e, type: 2}
   m_TimeReference: 0
   m_TargetMaterialRenderer: {fileID: 0}
   m_TargetMaterialProperty: <noninit>
@@ -3012,7 +3002,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 8400000, guid: b46278e4038bb5c4eabb83c4aafae660, type: 2}
+  m_Texture: {fileID: 8400000, guid: 1223de0b1e399fa4880e854a5c45788e, type: 2}
   m_UVRect:
     serializedVersion: 2
     x: 0
