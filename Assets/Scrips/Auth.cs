@@ -7,6 +7,9 @@ using UnityEngine.UI;
 
 public class Auth : MonoBehaviour
 {
+    // Trường panel Register
+    public GameObject panelRes;
+    public GameObject panelLogin;
     // Trường cho Register
     public InputField registerUsernameField;  // Ô nhập tên tài khoản đăng ký
     public InputField registerPasswordField;  // Ô nhập mật khẩu đăng ký
@@ -21,6 +24,16 @@ public class Auth : MonoBehaviour
 
     private string connectionString = "Server=DESKTOP-DPT7713\\SQLEXPRESS; Database=SolanaGame; User Id=sa; Password=123456;";
 
+    // hàm  set active login and Res
+    public void actionRes()
+    {
+        panelRes.SetActive(true);
+        panelLogin.SetActive(false);
+    }
+    public void actionLogin() {
+        panelLogin.SetActive(true);
+        panelRes.SetActive(false);
+    }
     // Hàm đăng ký tài khoản
     public void Register()
     {
