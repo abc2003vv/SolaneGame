@@ -1,173 +1,152 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Microsoft.Data.SqlClient;
+﻿using UnityEngine;
 using System;
+using Firebase.Database;
+using Google.MiniJSON;
 using UnityEngine.UI;
+using System.Security.Cryptography;
+using Unity.VisualScripting;
+using System.Text;
+using UnityEngine.SceneManagement;
+using Firebase.Auth;
+[Serializable]
+public class dataTosave
+{
 
+}
 public class Auth : MonoBehaviour
 {
-    // Trường panel Register
-    public GameObject panelRes;
-    public GameObject panelLogin;
-    // Trường cho Register
-    public InputField registerUsernameField;  // Ô nhập tên tài khoản đăng ký
-    public InputField registerPasswordField;  // Ô nhập mật khẩu đăng ký
-    public InputField confirmPasswordField;   // Ô nhập lại mật khẩu (dành cho đăng ký)
-    public InputField emailField;             // Ô nhập email (dành cho đăng ký)
-
-    // Trường cho Login
-    public InputField loginUsernameField;     // Ô nhập tên tài khoản đăng nhập
-    public InputField loginPasswordField;     // Ô nhập mật khẩu đăng nhập
-
-    public Text feedbackText;                 // Hiển thị thông báo cho người dùng
-
-    private string connectionString = "Server=DESKTOP-DPT7713\\SQLEXPRESS; Database=SolanaGame; User Id=sa; Password=123456;";
-
-    // hàm  set active login and Res
-    public void actionRes()
+    // gọi đối tượng
+    // input Unity
+    public GameObject PanelMessage;
+    public InputField username;
+    public InputField password;
+    public InputField userRes;
+    public InputField passwordRes;
+    public InputField agianpasswordRes;
+    public InputField Email;
+    private DatabaseReference databaseRef;
+    private FirebaseAuth auth;
+    private bool checkRes = false;
+    private void Awake()
     {
-        panelRes.SetActive(true);
-        panelLogin.SetActive(false);
+        databaseRef = FirebaseDatabase.DefaultInstance.RootReference;
     }
-    public void actionLogin() {
-        panelLogin.SetActive(true);
-        panelRes.SetActive(false);
-    }
-    // Hàm đăng ký tài khoản
-    public void Register()
+    public void LoadSceneByName(string sceneName)
     {
-        string username = registerUsernameField.text;
-        string password = registerPasswordField.text;
-        string confirmPassword = confirmPasswordField.text;
-        string email = emailField.text;
-
-        // Kiểm tra các trường dữ liệu không được bỏ trống
-        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword) || string.IsNullOrEmpty(email))
-        {
-            feedbackText.text = "Vui lòng điền đầy đủ thông tin!";
-            return;
-        }
-
-        // Kiểm tra mật khẩu và mật khẩu xác nhận
-        if (password != confirmPassword)
-        {
-            feedbackText.text = "Mật khẩu và xác nhận mật khẩu không khớp!";
-            return;
-        }
-
-        try
-        {
-            // Kết nối đến cơ sở dữ liệu và kiểm tra xem tài khoản đã tồn tại chưa
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                string checkQuery = "SELECT COUNT(*) FROM Account WHERE Username = @username";
-                using (SqlCommand checkCommand = new SqlCommand(checkQuery, connection))
-                {
-                    checkCommand.Parameters.AddWithValue("@username", username);
-
-                    int userExists = (int)checkCommand.ExecuteScalar();
-                    if (userExists > 0)
-                    {
-                        feedbackText.text = "Tài khoản đã tồn tại!";
-                        Debug.Log("Tài khoản đã tồn tại!");
-                        return;
-                    }
-                }
-
-                // Nếu tài khoản chưa tồn tại, tiến hành đăng ký
-                string query = "INSERT INTO Account (Username, Password, Email) VALUES (@username, @password, @email)";
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@username", username);
-                    command.Parameters.AddWithValue("@password", password); // Mật khẩu chưa mã hóa, có thể mã hóa sau nếu cần
-                    command.Parameters.AddWithValue("@email", email);
-
-                    int result = command.ExecuteNonQuery();
-                    if (result > 0)
-                    {
-                        feedbackText.text = "Đăng ký thành công!";
-                        Debug.Log("Đăng ký thành công!");
-                    }
-                    else
-                    {
-                        feedbackText.text = "Đăng ký thất bại.";
-                        Debug.Log("Đăng ký thất bại.");
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            feedbackText.text = "Lỗi khi đăng ký: " + e.Message;
-            Debug.LogError("Lỗi khi đăng ký: " + e.Message);
-        }
+        SceneManager.LoadScene(sceneName);
     }
-
-    // Hàm đăng nhập
+    //Login
     public void Login()
     {
-        string username = loginUsernameField.text;
-        string password = loginPasswordField.text;
+        string usernameInput = username.text;
+        string passwordInput = password.text;
 
-        // Kiểm tra các trường dữ liệu không được bỏ trống
-        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+        auth.Si(usernameInput, passwordInput).ContinueWith(task =>
         {
-            feedbackText.text = "Vui lòng điền tên đăng nhập và mật khẩu!";
-            return;
-        }
-
-        try
-        {
-            // Kết nối đến cơ sở dữ liệu và kiểm tra thông tin đăng nhập
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            if (task.IsCanceled)
             {
-                connection.Open();
-                string query = "SELECT Password FROM Account WHERE Username = @username";
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@username", username);
-
-                    string storedPassword = command.ExecuteScalar() as string;
-
-                    if (storedPassword != null)
-                    {
-                        if (storedPassword == password)
-                        {
-                            feedbackText.text = "Đăng nhập thành công!";
-                            Debug.Log("Đăng nhập thành công!");
-                            UpdateLastLogin(username, connection);
-                        }
-                        else
-                        {
-                            feedbackText.text = "Mật khẩu không chính xác!";
-                            Debug.Log("Mật khẩu không chính xác.");
-                        }
-                    }
-                    else
-                    {
-                        feedbackText.text = "Tài khoản không tồn tại!";
-                        Debug.Log("Tài khoản không tồn tại.");
-                    }
-                }
+                Debug.LogError("Login was canceled.");
+                return;
             }
-        }
-        catch (Exception e)
-        {
-            feedbackText.text = "Lỗi khi đăng nhập: " + e.Message;
-            Debug.LogError("Lỗi khi đăng nhập: " + e.Message);
-        }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("Login encountered an error: " + task.Exception);
+                return;
+            }
+
+            // Đăng nhập thành công
+            FirebaseUser user = task.Result;
+            Debug.Log("User logged in successfully: " + user.Email);
+
+            // Chuyển đến Scene mới (ví dụ: "Lobby")
+            LoadSceneByName("Lobby");
+        });
     }
 
-    // Cập nhật thời gian đăng nhập lần cuối
-    private void UpdateLastLogin(string username, SqlConnection connection)
+
+
+    //Register
+    public void Register()
     {
-        string query = "UPDATE Account SET LastLogin = GETDATE() WHERE Username = @username";
-        using (SqlCommand command = new SqlCommand(query, connection))
+        string usernameInput = userRes.text;
+        string passwordInput = passwordRes.text;
+        string confirmpasswrod = agianpasswordRes.text;
+        string email = Email.text;
+
+        // check 
+        if (string.IsNullOrEmpty(usernameInput) || string.IsNullOrEmpty(passwordInput) || string.IsNullOrEmpty(email))
         {
-            command.Parameters.AddWithValue("@username", username);
-            command.ExecuteNonQuery();
+            print("not null Res");
+        }
+        if (passwordInput != confirmpasswrod)
+        {
+            print("not equal password Res");
+        }
+        LoadSceneByName("Lobby");
+        string userID = Guid.NewGuid().ToString();
+        string passwordHash = HashPassword(passwordInput);
+        string registrantionDate = DateTime.Now.ToString("yyyy-MM-yy HH:mm:ss");
+        Users newuser = new Users(userID, usernameInput, passwordInput, passwordHash, registrantionDate, "active");
+        // save data in Firebase
+        CheckIfEmailExists(email, exists =>
+        {
+            if (exists)
+            {
+                Debug.LogError("Email already exists. Please use a different email.");
+            }
+            else
+            {
+                SaveDataUser(newuser);
+
+            }
+        });
+    }
+    private void SaveDataUser(Users users)
+    {
+        string json = JsonUtility.ToJson(users);
+
+        databaseRef.Child("users").Child(users.UserID).SetRawJsonValueAsync(json).ContinueWith(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("Step 2: Data saved successfully!");
+                checkRes = true;
+            }
+            else
+            {
+                Debug.LogError("Step 2: Failed to save data: " + task.Exception);
+            }
+        });
+    }
+    private string HashPassword(string password)
+    {
+        using (SHA256 sHA256 = SHA256.Create())
+        {
+            byte[] bytes = sHA256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (byte b in bytes)
+            {
+                stringBuilder.Append(b.ToString("x2"));
+            }
+            return stringBuilder.ToString();
         }
     }
+    //
+    private void CheckIfEmailExists(string email, Action<bool> callback)
+    {
+        databaseRef.Child("users").OrderByChild("email").EqualTo(email).GetValueAsync().ContinueWith(task =>
+        {
+            if (task.IsCompleted)
+            {
+                DataSnapshot snapshot = task.Result;
+                callback(snapshot.Exists); // True nếu email đã tồn tại
+            }
+            else
+            {
+                Debug.LogError("Failed to check email: " + task.Exception);
+                callback(false);
+            }
+        });
+    }
+
 }
