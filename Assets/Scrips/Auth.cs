@@ -8,6 +8,7 @@ using Unity.VisualScripting;
 using System.Text;
 using UnityEngine.SceneManagement;
 using Firebase.Auth;
+using Firebase.Extensions;
 [Serializable]
 public class dataTosave
 {
@@ -18,9 +19,8 @@ public class Auth : MonoBehaviour
     // gọi đối tượng
     // input Unity
     public GameObject PanelMessage;
-    public InputField username;
     public InputField password;
-    public InputField userRes;
+    public InputField EmailRes;
     public InputField passwordRes;
     public InputField agianpasswordRes;
     public InputField Email;
@@ -38,10 +38,16 @@ public class Auth : MonoBehaviour
     //Login
     public void Login()
     {
-        string usernameInput = username.text;
+        string emailInput = Email.text.Trim();
         string passwordInput = password.text;
 
-        auth.Si(usernameInput, passwordInput).ContinueWith(task =>
+        if (string.IsNullOrEmpty(emailInput) || string.IsNullOrEmpty(passwordInput))
+        {
+            Debug.LogError("Email or Password cannot be empty.");
+            return;
+        }
+
+        auth.SignInWithEmailAndPasswordAsync(emailInput, passwordInput).ContinueWith(task =>
         {
             if (task.IsCanceled)
             {
@@ -50,31 +56,33 @@ public class Auth : MonoBehaviour
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("Login encountered an error: " + task.Exception);
+                Debug.LogError("Login encountered an error.");
+                foreach (var exception in task.Exception.Flatten().InnerExceptions)
+                {
+                    Debug.LogError($"Error: {exception.Message}");
+                }
                 return;
             }
 
             // Đăng nhập thành công
-            FirebaseUser user = task.Result;
-            Debug.Log("User logged in successfully: " + user.Email);
-
-            // Chuyển đến Scene mới (ví dụ: "Lobby")
+            Firebase.Auth.AuthResult authResult = task.Result;
+            FirebaseUser user = authResult.User;
+            Debug.Log($"User logged in successfully! Email: {user.Email}, UserId: {user.UserId}");
             LoadSceneByName("Lobby");
         });
+
     }
-
-
 
     //Register
     public void Register()
     {
-        string usernameInput = userRes.text;
+        string EmailRess = EmailRes.text;
         string passwordInput = passwordRes.text;
         string confirmpasswrod = agianpasswordRes.text;
         string email = Email.text;
 
         // check 
-        if (string.IsNullOrEmpty(usernameInput) || string.IsNullOrEmpty(passwordInput) || string.IsNullOrEmpty(email))
+        if (string.IsNullOrEmpty(EmailRess) || string.IsNullOrEmpty(passwordInput))
         {
             print("not null Res");
         }
@@ -86,7 +94,7 @@ public class Auth : MonoBehaviour
         string userID = Guid.NewGuid().ToString();
         string passwordHash = HashPassword(passwordInput);
         string registrantionDate = DateTime.Now.ToString("yyyy-MM-yy HH:mm:ss");
-        Users newuser = new Users(userID, usernameInput, passwordInput, passwordHash, registrantionDate, "active");
+        Users newuser = new Users(userID, EmailRess, passwordInput, passwordHash, registrantionDate, "active",null);
         // save data in Firebase
         CheckIfEmailExists(email, exists =>
         {
@@ -97,7 +105,6 @@ public class Auth : MonoBehaviour
             else
             {
                 SaveDataUser(newuser);
-
             }
         });
     }
@@ -109,7 +116,7 @@ public class Auth : MonoBehaviour
         {
             if (task.IsCompleted)
             {
-                Debug.Log("Step 2: Data saved successfully!");
+                print("Step 2: Data saved successfully!");
                 checkRes = true;
             }
             else

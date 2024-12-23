@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "549760686530",
+    "firebase_url": "https://solanagame-23ce6-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "solanagame-23ce6",
+    "storage_bucket": "solanagame-23ce6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:549760686530:android:304a4ec3823cfc9ac05e5b",
+        "android_client_info": {
+          "package_name": "solane.com.vn"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa8BRw_5gOsj9MN6wCdHPR7p9HMUfjbjU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
